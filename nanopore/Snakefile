@@ -1,0 +1,687 @@
+
+minion_samples = ['shCTL_noyau_rep1', 'shCTL_noyau_rep2', 'shPABPN1_noyau_rep1', 'shPABPN1_noyau_rep2', 'shCTL_cyto_rep1', 'shCTL_cyto_rep2', 'shPABPN1_cyto_rep1', 'shPABPN1_cyto_rep2']
+p2_samples = ['shCTL_noyau_rep3', 'shPABPN1_noyau_rep3', 'shCTL_cyto_rep3', 'shPABPN1_cyto_rep3']
+all_samples = ['shCTL_noyau_rep1', 'shCTL_noyau_rep2', 'shPABPN1_noyau_rep1', 'shPABPN1_noyau_rep2', 'shCTL_noyau_rep3', 'shPABPN1_noyau_rep3', 'shCTL_cyto_rep3', 'shCTL_cyto_rep1', 'shCTL_cyto_rep2', 'shPABPN1_cyto_rep3', 'shPABPN1_cyto_rep1', 'shPABPN1_cyto_rep2', 'p2_rep4']
+minion_p2_run1_samples = ['shCTL_noyau_rep1', 'shCTL_noyau_rep2', 'shPABPN1_noyau_rep1', 'shPABPN1_noyau_rep2', 'shCTL_noyau_rep3', 'shPABPN1_noyau_rep3', 'shCTL_cyto_rep3', 'shCTL_cyto_rep1', 'shCTL_cyto_rep2', 'shPABPN1_cyto_rep3', 'shPABPN1_cyto_rep1', 'shPABPN1_cyto_rep2']
+rep4_samples = ['shCTL_noyau_rep4', 'shPABPN1_noyau_rep4', 'shCTL_cyto_rep4', 'shPABPN1_cyto_rep4']
+m6A_samples = ['shCTL_noyau_rep3', 'shPABPN1_noyau_rep3', 'shCTL_cyto_rep3', 'shPABPN1_cyto_rep3', 'shCTL_noyau_rep4', 'shPABPN1_noyau_rep4', 'shCTL_cyto_rep4', 'shPABPN1_cyto_rep4']
+all_final_samples = ['shCTL_noyau_rep1', 'shCTL_noyau_rep2', 'shCTL_noyau_rep3', 'shCTL_noyau_rep4', 'shPABPN1_noyau_rep1', 'shPABPN1_noyau_rep2', 'shPABPN1_noyau_rep3', 'shPABPN1_noyau_rep4', 'shCTL_cyto_rep1', 'shCTL_cyto_rep2', 'shCTL_cyto_rep3', 'shCTL_cyto_rep4', 'shPABPN1_cyto_rep1', 'shPABPN1_cyto_rep2', 'shPABPN1_cyto_rep3', 'shPABPN1_cyto_rep4']
+
+
+rule finale :
+    input :
+        nanoplot_reports = expand("results/nanoplot/{sample}/{sample}NanoPlot-report.html", sample = all_samples),
+        dorado_bam_polya_extracts = expand("results/dorado_bam/reads_polya_df_{sample}.txt", sample = all_samples),
+        splicing_fractions = expand("results/splicing/splicing_fraction_spliced/{minion_p2_run1_sample}_fraction_spliced.txt", minion_p2_run1_sample = minion_p2_run1_samples),
+        noyau_IR= "results/splicing/splicing_results/IR_analysis_nuc.txt",
+        cyto_IR="results/splicing/splicing_results/IR_analysis_nuc.txt",
+        read_ends = expand("results/read_ends/{minion_p2_run1_sample}_read_ends.txt", minion_p2_run1_sample = minion_p2_run1_samples),
+        isoquant_files = expand("results/isoquant/{minion_p2_run1_sample}/OUT/OUT.corrected_reads.bed.gz", minion_p2_run1_sample = minion_p2_run1_samples),
+        bed_alignment_genes_rep4 = expand("results/alignment_bam/{rep4_sample}/{rep4_sample}_minimap2_uniq_sort_genes.bed", rep4_sample = rep4_samples),
+        genes_read_counts = expand("/home/sbache/projects/def-kchoquet/sbache/scripts/snakemake_file/results/alignment_bam/{all_final_sample}/{all_final_sample}_minimap2_uniq_sort_genes_count.txt", all_final_sample = all_final_samples),
+        modkit_summary = expand("results/modkit/{m6A_sample}_summary.txt", m6A_sample = m6A_samples),
+        noyau_diff_m6A_rep3 = "results/modkit/noyau_diff_m6A_rep3.txt",
+        cyto_diff_m6A_rep3= "results/modkit/cyto_diff_m6A_rep3.txt",
+        noyau_diff_m6A_rep4= "results/modkit/noyau_diff_m6A_rep4.txt",
+        cyto_diff_m6A_rep4= "results/modkit/cyto_diff_m6A_rep4.txt",
+        noyau_diff_m6A_all_reps = "results/modkit/noyau_diff_m6A_all_reps.txt",
+        cyto_diff_m6A_all_reps = "results/modkit/cyto_diff_m6A_all_reps.txt",
+        bed_genes_m6A = expand("results/modkit/{m6A_sample}_m6A_genes.bed", m6A_sample = m6A_samples),
+        m6A_extract_calls = expand("results/modkit/{m6A_sample}_m6A_calls.tsv", m6A_sample = m6A_samples)
+
+
+rule demux_p2_rep4 :
+    threads : 1
+    input :
+        "/home/sbache/projects/def-kchoquet/sequencing_data_repo/nanopore/directRNAseq/startingFiles/251125_SB3_shNT_shPABPN1_noyau_cyto_multiplexed_P2"
+    output :
+        "results/demux/p2_rep4/pod5.demux.tsv.gz"
+    log:
+        error='logs_error/demux_p2_rep4.e'
+    params :
+        intermediate_file = "/home/sbache/projects/def-kchoquet/sequencing_data_repo/nanopore/directRNAseq/startingFiles/251125_SB3_shNT_shPABPN1_noyau_cyto_multiplexed_P2/demux/pod5.demux.tsv.gz",
+        output_dir = "results/demux/p2_rep4/"
+    shell :
+        """
+        module load cuda
+        module load apptainer
+        apptainer run --nv --no-home \
+            --bind {input}:/data \
+            /home/sbache/projects/def-kchoquet/sbache/scripts/seqtagger.sif mRNA \
+            -k /opt/app/models/b96_RNA004 \
+            -r \
+            -i /data/pod5 \
+            -o /data/demux 2>{log.error}
+        cp {params.intermediate_file} {params.output_dir}
+        """
+
+rule dorado_minion :
+    threads : 3
+    wildcard_constraints:
+        minion_sample = "|".join(minion_samples)
+    input:
+        "/home/sbache/projects/def-kchoquet/sequencing_data_repo/nanopore/directRNAseq/startingFiles/23XXXX_SB1_{minion_sample}_minion/output.pod5"
+    output:
+        "results/dorado_bam/{minion_sample}/{minion_sample}.bam"
+    log:
+        error='logs_error/dorado_minion_{minion_sample}.e'
+    shell :
+        """
+        module load StdEnv/2023
+        module load dorado/0.9.5
+        dorado basecaller --estimate-poly-a /home/sbache/projects/def-kchoquet/sbache/scripts/dorado_model/rna002_70bps_hac@v3 {input} > {output} 2>{log.error}
+        """
+
+rule dorado_p2 :
+    threads : 4
+    wildcard_constraints:
+        p2_sample="|".join(p2_samples)
+    input:
+        "/home/sbache/scratch/PABPN1_nanopore/startingFiles_pod5_all/{p2_sample}/output.pod5"
+    output:
+        "results/dorado_bam/{p2_sample}/{p2_sample}.bam"
+    params:
+        mA_model="/home/sbache/projects/def-kchoquet/sbache/scripts/dorado_model/rna004_130bps_hac@v5.2.0_m6A_DRACH@v1"
+    log:
+        error='logs_error/dorado_p2_{p2_sample}.e'
+    shell :
+        """
+        module load StdEnv/2023
+        module load dorado/1.0.2
+        dorado basecaller --estimate-poly-a /home/sbache/projects/def-kchoquet/sbache/scripts/dorado_model/rna004_130bps_hac@v5.2.0 {input} --modified-bases-models {params.mA_model} > {output} 2>{log.error}
+        """
+
+rule dorado_p2_rep4 :
+    threads : 4
+    input:
+        "/home/sbache/projects/def-kchoquet/sequencing_data_repo/nanopore/directRNAseq/startingFiles/251125_SB3_shNT_shPABPN1_noyau_cyto_multiplexed_P2/pod5"
+    output:
+        "results/dorado_bam/p2_rep4/p2_rep4.bam"
+    params:
+        mA_model="/home/sbache/projects/def-kchoquet/sbache/scripts/dorado_model/rna004_130bps_hac@v5.2.0_m6A_DRACH@v1"
+    log:
+        error='logs_error/dorado_p2_rep4.e'
+    shell :
+        """
+        module load StdEnv/2023
+        module load dorado/1.0.2
+        dorado basecaller --estimate-poly-a /home/sbache/projects/def-kchoquet/sbache/scripts/dorado_model/rna004_130bps_hac@v5.2.0 {input} --modified-bases-models {params.mA_model} > {output} 2>{log.error}
+        """
+
+rule nanoplot :
+    threads : 4
+    wildcard_constraints:
+        sample="|".join(all_samples)
+    input :
+        "results/dorado_bam/{sample}/{sample}.bam"
+    output :
+        "results/nanoplot/{sample}/{sample}NanoPlot-report.html"
+    params :
+        outdir = "results/nanoplot/{sample}",
+        prefix = "{sample}"
+    log :
+        error = "logs_error/nanoplot_{sample}.e"
+    conda :
+        "envs/nanoplot.yaml"
+    shell :
+        """
+        NanoPlot --ubam {input} -o {params.outdir} --store -f png --huge -p {params.prefix} --tsv_stats --info_in_report --loglength -t {threads}
+        """
+
+rule dorado_polya_extract :
+    threads : 1
+    wildcard_constraints:
+        sample="|".join(all_samples)
+    input :
+        "results/dorado_bam/{sample}/{sample}.bam"
+    output :
+        "results/dorado_bam/reads_polya_df_{sample}.txt"
+    params :
+        samfile = "results/dorado_bam/{sample}/{sample}.sam",
+        dorado_analysis_script = "scripts/dorado_analysis.py"
+    log :
+        error_bamtosam = "logs_error/dorado_polya_extract_bam_to_sam{sample}.e",
+        error_script= "logs_error/dorado_polya_extract_bam_to_sam{sample}.e"
+    shell :
+        """
+        module load StdEnv/2023
+        module load samtools/1.22.1
+        samtools view -h {input} > {params.samfile} 2>{log.error_bamtosam}
+        source /home/sbache/projects/def-kchoquet/sbache/scripts/ENV/bin/activate
+        python {params.dorado_analysis_script} {params.samfile} {output} 2>{log.error_script}
+        rm {params.samfile}
+        """
+
+rule convert_to_fastq :
+    threads : 2
+    wildcard_constraints:
+        sample="|".join(all_samples)
+    input :
+        "results/dorado_bam/{sample}/{sample}.bam"
+    output :
+        "results/fastq/{sample}.fastq"
+    log :
+        error = 'logs_error/convert_to_fastq_{sample}.e'
+    shell :
+        """
+        module load StdEnv/2020
+        module load samtools/1.17
+        samtools fastq -TMM,ML,pt {input} > {output} 2>{log.error}
+        """
+
+rule minimap2 :
+    threads : 4
+    wildcard_constraints:
+        sample="|".join(all_samples)
+    input :
+        "results/fastq/{sample}.fastq"
+    output :
+        "results/alignment_bam/{sample}/{sample}_minimap2.sam"
+    params:
+        reference="/home/sbache/projects/def-kchoquet/reference_libraries/hg38/Homo_sapiens.GRCh38.dna.primary_assembly.and.sacCer3_ENO2.fa",
+        direct="results/alignment_bam/{sample}"
+    log :
+        error = 'logs_error/minimap2_{sample}.e'
+    shell :
+        """
+        module load StdEnv/2020
+        module load minimap2/2.24
+        if [ ! -d {params.direct} ]; then
+            mkdir -p {params.direct}
+        fi
+        minimap2 -ax splice -uf -k14 -y -t 4 {params.reference} {input} > {output} 2>{log.error}
+        """
+
+rule samtools_sort_index :
+    threads : 1
+    wildcard_constraints:
+        sample="|".join(all_samples)
+    input :
+        "results/alignment_bam/{sample}/{sample}_minimap2.sam"
+    output :
+        bam="results/alignment_bam/{sample}/{sample}_minimap2_sort.bam",
+        index="results/alignment_bam/{sample}/{sample}_minimap2_sort.bam.bai"
+    log:
+        error='logs_error/samtools_sort_index_{sample}.e'
+    shell :
+        """
+        module load StdEnv/2020
+        module load samtools/1.17
+        samtools sort {input} -o {output.bam} 2>{log.error}
+        samtools index {output.bam}
+        """
+
+rule extract_unique_reads :
+    threads : 4
+    wildcard_constraints:
+        sample="|".join(all_samples)
+    input :
+        sort_bam="results/alignment_bam/{sample}/{sample}_minimap2_sort.bam",
+        sam="results/alignment_bam/{sample}/{sample}_minimap2.sam"
+    output :
+        bam="results/alignment_bam/{sample}/{sample}_minimap2_uniq_sort.bam",
+        index="results/alignment_bam/{sample}/{sample}_minimap2_uniq_sort.bam.bai"
+    params:
+        direct="results/alignment_bam/{sample}/",
+        reference="/home/sbache/projects/def-kchoquet/reference_libraries/hg38/Homo_sapiens.GRCh38.dna.primary_assembly.and.sacCer3_ENO2.fa"
+    log :
+        error = 'logs_error/extract_unique_reads_{sample}.e'
+    shell :
+        """
+        module load StdEnv/2020
+        module load samtools/1.17
+        grep ^@ {input.sam} > {params.direct}headers.sam
+        grep -v ^@  {input.sam} | sort > {params.direct}alignment.sam
+        awk '$3!="*" {{print}}' {params.direct}alignment.sam | cut -f 1 | sort | uniq -c | awk '$1==1 {{print $2}}' > {params.direct}uniq_names.txt
+        grep -F -f {params.direct}uniq_names.txt {params.direct}alignment.sam > {params.direct}uniq_alignment.sam
+        cat {params.direct}headers.sam {params.direct}uniq_alignment.sam > {params.direct}headers_uniq_temp.sam
+        samtools view -bT {params.reference} {params.direct}headers_uniq_temp.sam > {params.direct}headers_uniq_temp.bam
+        samtools sort {params.direct}headers_uniq_temp.bam -o {output.bam} 2>{log.error}
+        samtools index {output.bam}
+        rm {params.direct}headers.sam
+        rm {params.direct}alignment.sam
+        rm {params.direct}uniq_names.txt
+        rm {params.direct}uniq_alignment.sam
+        rm {params.direct}headers_uniq_temp.sam
+        rm {params.direct}headers_uniq_temp.bam
+        """
+
+rule bed_from_bam :
+    threads : 1
+    wildcard_constraints:
+        minion_p2_run1_sample="|".join(minion_p2_run1_samples)
+    input :
+        "results/alignment_bam/{minion_p2_run1_sample}/{minion_p2_run1_sample}_minimap2_uniq_sort.bam"
+    output :
+        "results/alignment_bam/{minion_p2_run1_sample}/{minion_p2_run1_sample}_minimap2_uniq_sort.bed"
+    params:
+        direct="results/alignment_bam/{minion_p2_run1_sample}/"
+    log:
+        error_bamtobed='logs_error/bed_from_bam_{minion_p2_run1_sample}.e',
+        error_polya='logs_error/polya_tmp_{minion_p2_run1_sample}.e'
+    shell :
+        """
+        module load StdEnv/2020
+        module load samtools/1.17
+        module load bedtools/2.30.0
+        bedtools bamtobed -cigar -tag NM -i {input} > {params.direct}uniq_sort_tmp.bed 2>{log.error_bamtobed}
+        samtools view {input} | awk '{{
+            pt = "NA";
+            for (i=12; i<=NF; i++) {{
+                if ($i ~ /^pt:i:/) pt = substr($i,6)
+            }}
+            print pt
+        }}' > {params.direct}polya.txt 2>{log.error_polya}
+        paste {params.direct}uniq_sort_tmp.bed {params.direct}polya.txt > {output}
+        """
+
+rule bed_intersect_genes :
+    threads: 1
+    wildcard_constraints:
+        minion_p2_run1_sample="|".join(minion_p2_run1_samples)
+    input :
+        "results/alignment_bam/{minion_p2_run1_sample}/{minion_p2_run1_sample}_minimap2_uniq_sort.bed"
+    output :
+        "results/alignment_bam/{minion_p2_run1_sample}/{minion_p2_run1_sample}_minimap2_uniq_sort_genes.bed"
+    params :
+        reference_genes = "/home/sbache/projects/def-kchoquet/reference_libraries/hg38/Homo_sapiens.GRCh38.86.genes.bed"
+    log:
+        error='logs_error/bed_intersect_genes_{minion_p2_run1_sample}.e'
+    shell :
+        """
+        module load StdEnv/2020
+        module load bedtools/2.30.0
+        bedtools intersect -s -f 0.5 -a {input} -b {params.reference_genes} -wo > {output} 2>{log.error}
+        """
+
+rule bed_intersect_introns :
+    threads: 1
+    wildcard_constraints:
+        minion_p2_run1_sample="|".join(minion_p2_run1_samples)
+    input :
+        "results/alignment_bam/{minion_p2_run1_sample}/{minion_p2_run1_sample}_minimap2_uniq_sort.bed"
+    output :
+        "results/splicing/{minion_p2_run1_sample}/{minion_p2_run1_sample}.intersect_introns.bed"
+    params :
+        reference_introns = "/home/sbache/projects/def-kchoquet/reference_libraries/hg38/NCBI_RefSeq_hg38_introns_parsed_bedtool_for_intron_pairs.bed",
+        direct = "results/splicing/{minion_p2_run1_sample}"
+    log:
+        error='logs_error/bed_intersect_introns_{minion_p2_run1_sample}.e'
+    shell :
+        """
+        module load StdEnv/2020
+        module load bedtools/2.30.0
+        if [ ! -d {params.direct} ]; then
+            mkdir -p {params.direct}
+        fi
+        bedtools intersect -s -a {input} -b {params.reference_introns} -wo > {output} 2>{log.error}
+        """
+
+rule splicing_info :
+    threads : 2
+    wildcard_constraints:
+        minion_p2_run1_sample="|".join(minion_p2_run1_samples)
+    input :
+        "results/splicing/{minion_p2_run1_sample}/{minion_p2_run1_sample}.intersect_introns.bed"
+    output :
+        splicing_info = "results/splicing/splicing_raw_data/{minion_p2_run1_sample}_hg38_splicing_info_per_intron.withSKP.RefSeq.txt"
+    params :
+        splicing_dict = "results/splicing/{minion_p2_run1_sample}/{minion_p2_run1_sample}_hg38_splicing_dictionary.withSKP.RefSeq",
+        script_splice_dict = "scripts/splice_dict_dataset.withSKP_and_UND.py"
+    log:
+        error_1='logs_error/splicing_info_1_{minion_p2_run1_sample}.e',
+    shell :
+        """
+        source /home/sbache/projects/def-kchoquet/sbache/scripts/ENV/bin/activate
+        python {params.script_splice_dict} {input} {output.splicing_info} {params.splicing_dict} 2>{log.error_1}
+        """
+
+rule splicing_fractions :
+    threads : 1
+    wildcard_constraints:
+        minion_p2_run1_sample="|".join(minion_p2_run1_samples)
+    input :
+        "results/splicing/splicing_raw_data/{minion_p2_run1_sample}_hg38_splicing_info_per_intron.withSKP.RefSeq.txt"
+    output :
+        "results/splicing/splicing_fraction_spliced/{minion_p2_run1_sample}_fraction_spliced.txt"
+    params :
+        script_splicing_fraction = "scripts/splicing_fraction.py"
+    log :
+        error = "logs_error/splicing_fractions_{minion_p2_run1_sample}.e"
+    shell :
+        """
+        source /home/sbache/projects/def-kchoquet/sbache/scripts/ENV/bin/activate
+        python {params.script_splicing_fraction} {input} {output} 2>{log.error}
+        """
+
+rule IR_analysis :
+    threads : 1
+    wildcard_constraints:
+        minion_p2_run1_sample="|".join(minion_p2_run1_samples)
+    input :
+        splicing_info = expand("results/splicing/splicing_raw_data/{minion_p2_run1_sample}_hg38_splicing_info_per_intron.withSKP.RefSeq.txt", minion_p2_run1_sample = minion_p2_run1_samples)
+    output :
+        noyau_IR = "results/splicing/splicing_results/IR_analysis_nuc.txt",
+        cyto_IR = "results/splicing/splicing_results/IR_analysis_cyto.txt"
+    params :
+        IR_analysis_script = "scripts/IR_analysis_snakemake.py",
+        splicing_dict = "results/splicing/splicing_raw_data",
+        gene_name_ref = "/home/sbache/projects/def-kchoquet/sbache/analysis/hg38_UCSC_refGene_names.txt",
+        introns_ref = "/home/sbache/projects/def-kchoquet/sbache/analysis/hg38_all_intron_features_with_GC_and_BP_scores.txt"
+    log:
+        error_nuc='logs_error/IR_analysis_nuc.e',
+        error_cyto='logs_error/IR_analysis_cyto.e'
+    shell :
+        """
+        source /home/sbache/projects/def-kchoquet/sbache/scripts/ENV/bin/activate
+        python {params.IR_analysis_script} noyau {params.splicing_dict} {params.gene_name_ref} {params.introns_ref} {output.noyau_IR} 2>{log.error_nuc}
+        python {params.IR_analysis_script} cyto {params.splicing_dict} {params.gene_name_ref} {params.introns_ref} {output.cyto_IR} 2>{log.error_cyto}
+        """
+
+rule get_read_ends :
+    threads: 2
+    wildcard_constraints:
+        minion_p2_run1_sample="|".join(minion_p2_run1_samples)
+    input :
+        bam = "results/alignment_bam/{minion_p2_run1_sample}/{minion_p2_run1_sample}_minimap2_uniq_sort.bam",
+        bed = "results/alignment_bam/{minion_p2_run1_sample}/{minion_p2_run1_sample}_minimap2_uniq_sort_genes.bed"
+    output :
+        "results/read_ends/{minion_p2_run1_sample}_read_ends.txt"
+    params:
+        script = "scripts/get_read_ends.py"
+    log:
+        error='logs_error/get_read_ends_{minion_p2_run1_sample}.e'
+    shell :
+        """
+        source /home/sbache/projects/def-kchoquet/sbache/scripts/ENV/bin/activate
+        python {params.script} {input.bam} {input.bed} {output}
+        """
+
+rule isoquant :
+    threads: 4
+    wildcard_constraints:
+        minion_p2_run1_sample="|".join(minion_p2_run1_samples)
+    input :
+        "results/alignment_bam/{minion_p2_run1_sample}/{minion_p2_run1_sample}_minimap2_uniq_sort.bam"
+    output :
+        "results/isoquant/{minion_p2_run1_sample}/OUT/OUT.corrected_reads.bed.gz"
+    log:
+        error='logs_error/isoquant_{minion_p2_run1_sample}.e',
+        python = "logs_error/isoquant_python_{minion_p2_run1_sample}.e"
+    params:
+        reference_fasta = "/home/sbache/projects/def-kchoquet/reference_libraries/hg38/Homo_sapiens.GRCh38.dna.primary_assembly.and.sacCer3_ENO2.fa",
+        gtf = "/home/sbache/projects/def-kchoquet/sbache/Homo_sapiens.GRCh38.110.gtf",
+        out_dir = "results/isoquant/{minion_p2_run1_sample}"
+    conda :
+        "envs/isoquant.yaml"
+    shell :
+        """
+        which python > {log.python}
+        if [ ! -d {params.out_dir} ]; then
+            mkdir -p {params.out_dir}
+        fi
+        isoquant.py --bam {input} -r {params.reference_fasta} -g {params.gtf} --complete_genedb --stranded reverse -o {params.out_dir} -t {threads} --data_type ont --force 2>{log.error}
+        """
+
+rule split_multiplexed_bam :
+    threads : 1
+    input :
+        demux_file = "results/demux/p2_rep4/pod5.demux.tsv.gz",
+        multi_bam = "results/alignment_bam/p2_rep4/p2_rep4_minimap2_uniq_sort.bam"
+    output :
+        bam1 = "results/alignment_bam/p2_rep4/p2_rep4_minimap2_uniq_sort.bc_1.bam",
+        bam2= "results/alignment_bam/p2_rep4/p2_rep4_minimap2_uniq_sort.bc_2.bam",
+        bam3= "results/alignment_bam/p2_rep4/p2_rep4_minimap2_uniq_sort.bc_3.bam",
+        bam4= "results/alignment_bam/p2_rep4/p2_rep4_minimap2_uniq_sort.bc_4.bam"
+    log:
+        error='logs_error/split_multiplexed_bam.e'
+    params :
+        directory = "results"
+    shell :
+        """
+        module load cuda
+        module load apptainer
+        apptainer run --nv --no-home \
+            --bind {params.directory}:/data:rw \
+            /home/sbache/projects/def-kchoquet/sbache/scripts/seqtagger.sif bam_split_by_barcode.py \
+            -i /data/demux/p2_rep4/pod5.demux.tsv.gz \
+            -f /data/alignment_bam/p2_rep4/p2_rep4_minimap2_uniq_sort.bam \
+            -o /data/alignment_bam/p2_rep4/p2_rep4_minimap2_uniq_sort
+        """
+
+rule rename_bam_from_multiplex :
+    threads : 1
+    input :
+        bam1 = "results/alignment_bam/p2_rep4/p2_rep4_minimap2_uniq_sort.bc_1.bam",
+        bam2 = "results/alignment_bam/p2_rep4/p2_rep4_minimap2_uniq_sort.bc_2.bam",
+        bam3 = "results/alignment_bam/p2_rep4/p2_rep4_minimap2_uniq_sort.bc_3.bam",
+        bam4 = "results/alignment_bam/p2_rep4/p2_rep4_minimap2_uniq_sort.bc_4.bam"
+    output :
+        shCTL_cyto_rep4_bam = "results/alignment_bam/shCTL_cyto_rep4/shCTL_cyto_rep4_minimap2_uniq_sort.bam",
+        shPABPN1_cyto_rep4_bam = "results/alignment_bam/shPABPN1_cyto_rep4/shPABPN1_cyto_rep4_minimap2_uniq_sort.bam",
+        shCTL_noyau_rep4_bam = "results/alignment_bam/shCTL_noyau_rep4/shCTL_noyau_rep4_minimap2_uniq_sort.bam",
+        shPABPN1_noyau_rep4_bam = "results/alignment_bam/shPABPN1_noyau_rep4/shPABPN1_noyau_rep4_minimap2_uniq_sort.bam"
+    log:
+        error='logs_error/rename_bam_from_multiplex.e'
+    shell :
+        """
+        module load samtools
+        cp {input.bam1} {output.shCTL_cyto_rep4_bam}
+        cp {input.bam2} {output.shPABPN1_cyto_rep4_bam}
+        cp {input.bam3} {output.shCTL_noyau_rep4_bam}
+        cp {input.bam4} {output.shPABPN1_noyau_rep4_bam}
+        samtools index {output.shCTL_cyto_rep4_bam}
+        samtools index {output.shPABPN1_cyto_rep4_bam}
+        samtools index {output.shCTL_noyau_rep4_bam}
+        samtools index {output.shPABPN1_noyau_rep4_bam}
+        """
+
+rule bed_from_bam_rep4 :
+    threads : 1
+    wildcard_constraints:
+        rep4_sample="|".join(rep4_samples)
+    input :
+        "results/alignment_bam/{rep4_sample}/{rep4_sample}_minimap2_uniq_sort.bam"
+    output :
+        "results/alignment_bam/{rep4_sample}/{rep4_sample}_minimap2_uniq_sort.bed"
+    params:
+        direct="results/alignment_bam/{rep4_sample}/"
+    log:
+        error_bamtobed='logs_error/bed_from_bam_{rep4_sample}.e',
+        error_polya='logs_error/polya_tmp_{rep4_sample}.e'
+    shell :
+        """
+        module load StdEnv/2020
+        module load samtools/1.17
+        module load bedtools/2.30.0
+        bedtools bamtobed -cigar -tag NM -i {input} > {params.direct}uniq_sort_tmp.bed 2>{log.error_bamtobed}
+        samtools view {input} | awk '{{
+            pt = "NA";
+            for (i=12; i<=NF; i++) {{
+                if ($i ~ /^pt:i:/) pt = substr($i,6)
+            }}
+            print pt
+        }}' > {params.direct}polya.txt 2>{log.error_polya}
+        paste {params.direct}uniq_sort_tmp.bed {params.direct}polya.txt > {output}
+        """
+
+rule bed_intersect_genes_rep4 :
+    threads: 1
+    wildcard_constraints:
+        rep4_sample="|".join(rep4_samples)
+    input :
+        "results/alignment_bam/{rep4_sample}/{rep4_sample}_minimap2_uniq_sort.bed"
+    output :
+        "results/alignment_bam/{rep4_sample}/{rep4_sample}_minimap2_uniq_sort_genes.bed"
+    params :
+        reference_genes = "/home/sbache/projects/def-kchoquet/reference_libraries/hg38/Homo_sapiens.GRCh38.86.genes.bed"
+    log:
+        error='logs_error/bed_intersect_genes_{rep4_sample}.e'
+    shell :
+        """
+        module load StdEnv/2020
+        module load bedtools/2.30.0
+        bedtools intersect -s -f 0.5 -a {input} -b {params.reference_genes} -wo > {output} 2>{log.error}
+        """
+
+rule count_reads_genes :
+    threads : 1
+    wildcard_constraints:
+        all_final_sample="|".join(all_final_samples)
+    input :
+        "/home/sbache/projects/def-kchoquet/sbache/scripts/snakemake_file/results/alignment_bam/{all_final_sample}/{all_final_sample}_minimap2_uniq_sort_genes.bed"
+    output :
+        "/home/sbache/projects/def-kchoquet/sbache/scripts/snakemake_file/results/alignment_bam/{all_final_sample}/{all_final_sample}_minimap2_uniq_sort_genes_count.txt"
+    params :
+        script = "scripts/count_reads_genes.py"
+    log:
+        error='logs_error/count_reads_genes_{all_final_sample}.e',
+    shell :
+        """
+        source /home/sbache/projects/def-kchoquet/sbache/scripts/ENV/bin/activate
+        python {params.script} {input} {output} 2>{log.error}
+        """
+
+rule modkit :
+    threads : 4
+    wildcard_constraints:
+        m6A_sample="|".join(m6A_samples)
+    input :
+        "results/alignment_bam/{m6A_sample}/{m6A_sample}_minimap2_uniq_sort.bam"
+    output :
+        bed = "results/modkit/{m6A_sample}_m6A.bed",
+        bed_compressed = "results/modkit/{m6A_sample}_m6A.bed.gz"
+    log:
+        error='logs_error/modkit_{m6A_sample}.e'
+    conda:
+        "envs/modkit.yaml"
+    shell :
+        """
+        module load tabix/0.2.6
+        modkit pileup -t {threads} {input} {output.bed} --filter-threshold A:0.90
+        bgzip -c {output.bed} > {output.bed_compressed}
+        tabix -p bed {output.bed_compressed}
+        """
+
+rule modkit_summary :
+    threads : 4
+    wildcard_constraints:
+        m6A_sample="|".join(m6A_samples)
+    input :
+        "results/alignment_bam/{m6A_sample}/{m6A_sample}_minimap2_uniq_sort.bam"
+    output :
+        "results/modkit/{m6A_sample}_summary.txt"
+    log:
+        error='logs_error/modkit_summary_{m6A_sample}.e'
+    conda:
+        "envs/modkit.yaml"
+    shell :
+        """
+        modkit summary {input} -t {threads} --no-sampling --filter-threshold A:0.90 > {output}
+        """
+
+rule modkit_diff_rep3:
+    threads : 4
+    input :
+        shCTL_nucleus = "results/modkit/shCTL_noyau_rep3_m6A.bed.gz",
+        shPABPN1_nucleus = "results/modkit/shPABPN1_noyau_rep3_m6A.bed.gz",
+        shCTL_cyto = "results/modkit/shCTL_cyto_rep3_m6A.bed.gz",
+        shPABPN1_cyto = "results/modkit/shPABPN1_cyto_rep3_m6A.bed.gz"
+    output :
+        nucleus = "results/modkit/noyau_diff_m6A_rep3.txt",
+        cytoplasm = "results/modkit/cyto_diff_m6A_rep3.txt"
+    log:
+        error='logs_error/modkit_diff_rep3.e'
+    params:
+        reference = "/home/sbache/projects/def-kchoquet/reference_libraries/hg38/Homo_sapiens.GRCh38.dna.primary_assembly.and.sacCer3_ENO2.fa"
+    conda:
+        "envs/modkit.yaml"
+    shell :
+        """
+        modkit dmr pair -a {input.shCTL_nucleus} -b {input.shPABPN1_nucleus} -o {output.nucleus} --threads {threads} --base A --ref {params.reference} --header -f
+        modkit dmr pair -a {input.shCTL_cyto} -b {input.shPABPN1_cyto} -o {output.cytoplasm} --threads {threads} --base A --ref {params.reference} --header -f
+        """
+
+rule modkit_diff_rep4:
+    threads : 4
+    input :
+        shCTL_nucleus = "results/modkit/shCTL_noyau_rep4_m6A.bed.gz",
+        shPABPN1_nucleus = "results/modkit/shPABPN1_noyau_rep4_m6A.bed.gz",
+        shCTL_cyto = "results/modkit/shCTL_cyto_rep4_m6A.bed.gz",
+        shPABPN1_cyto = "results/modkit/shPABPN1_cyto_rep4_m6A.bed.gz"
+    output :
+        nucleus = "results/modkit/noyau_diff_m6A_rep4.txt",
+        cytoplasm = "results/modkit/cyto_diff_m6A_rep4.txt"
+    log:
+        error='logs_error/modkit_diff_rep4.e'
+    params:
+        reference = "/home/sbache/projects/def-kchoquet/reference_libraries/hg38/Homo_sapiens.GRCh38.dna.primary_assembly.and.sacCer3_ENO2.fa"
+    conda:
+        "envs/modkit.yaml"
+    shell :
+        """
+        modkit dmr pair -a {input.shCTL_nucleus} -b {input.shPABPN1_nucleus} -o {output.nucleus} --threads {threads} --base A --ref {params.reference} --header -f
+        modkit dmr pair -a {input.shCTL_cyto} -b {input.shPABPN1_cyto} -o {output.cytoplasm} --threads {threads} --base A --ref {params.reference} --header -f
+        """
+
+rule modkit_diff_all_reps:
+    threads : 4
+    input :
+        shCTL_nucleus_rep3 = "results/modkit/shCTL_noyau_rep3_m6A.bed.gz",
+        shPABPN1_nucleus_rep3 = "results/modkit/shPABPN1_noyau_rep3_m6A.bed.gz",
+        shCTL_cyto_rep3 = "results/modkit/shCTL_cyto_rep3_m6A.bed.gz",
+        shPABPN1_cyto_rep3 = "results/modkit/shPABPN1_cyto_rep3_m6A.bed.gz",
+        shCTL_nucleus_rep4 = "results/modkit/shCTL_noyau_rep4_m6A.bed.gz",
+        shPABPN1_nucleus_rep4 = "results/modkit/shPABPN1_noyau_rep4_m6A.bed.gz",
+        shCTL_cyto_rep4 = "results/modkit/shCTL_cyto_rep4_m6A.bed.gz",
+        shPABPN1_cyto_rep4 = "results/modkit/shPABPN1_cyto_rep4_m6A.bed.gz"
+    output :
+        nucleus = "results/modkit/noyau_diff_m6A_all_reps.txt",
+        cytoplasm = "results/modkit/cyto_diff_m6A_all_reps.txt"
+    log:
+        error='logs_error/modkit_diff_all_reps.e'
+    params:
+        reference = "/home/sbache/projects/def-kchoquet/reference_libraries/hg38/Homo_sapiens.GRCh38.dna.primary_assembly.and.sacCer3_ENO2.fa"
+    conda:
+        "envs/modkit.yaml"
+    shell :
+        """
+        modkit dmr pair -a {input.shCTL_nucleus_rep3} -a {input.shCTL_nucleus_rep4} -b {input.shPABPN1_nucleus_rep3} -b {input.shPABPN1_nucleus_rep4} -o {output.nucleus} --threads {threads} --base A --ref {params.reference} --header -f
+        modkit dmr pair -a {input.shCTL_cyto_rep3} -a {input.shCTL_cyto_rep4} -b {input.shPABPN1_cyto_rep3} -b {input.shPABPN1_cyto_rep4} -o {output.cytoplasm} --threads {threads} --base A --ref {params.reference} --header -f
+        """
+
+rule bed_intersect_m6A :
+    threads: 1
+    wildcard_constraints:
+        m6A_sample="|".join(m6A_samples)
+    input :
+        "results/modkit/{m6A_sample}_m6A.bed"
+    output :
+        "results/modkit/{m6A_sample}_m6A_genes.bed"
+    params :
+        reference_genes = "/home/sbache/projects/def-kchoquet/reference_libraries/hg38/Homo_sapiens.GRCh38.86.genes.bed"
+    log:
+        error='logs_error/bed_intersect_m6A_{m6A_sample}.e'
+    shell :
+        """
+        module load StdEnv/2020
+        module load bedtools/2.30.0
+        bedtools intersect -s -a {input} -b {params.reference_genes} -wo > {output} 2>{log.error}
+        """
+
+rule modkit_extract_calls :
+    threads : 6
+    wildcard_constraints:
+        m6A_sample="|".join(m6A_samples)
+    input :
+        "results/alignment_bam/{m6A_sample}/{m6A_sample}_minimap2_uniq_sort.bam"
+    output :
+        "results/modkit/{m6A_sample}_m6A_calls.tsv"
+    log:
+        error='logs_error/modkit_extract_calls_{m6A_sample}.e'
+    conda:
+        "envs/modkit.yaml"
+    shell :
+        """
+        modkit extract calls --filter-threshold A:0.90 --pass-only -t {threads} {input} {output}
+        """
