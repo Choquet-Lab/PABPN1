@@ -1,0 +1,14 @@
+name: modkit_064
+channels:
+  - bioconda
+  - conda-forge
+  - nodefaults
+  - defaults
+dependencies:
+  - _openmp_mutex=4.5=20_gnu
+  - libgcc=16.1.0=ha9f2e26_1
+  - libgomp=16.1.0=he0feb66_1
+  - libstdcxx=16.1.0=h934c35e_1
+  - libzlib=1.3.2=h25fd6f3_3
+  - ont-modkit=0.6.4=h7f49ad2_0
+prefix: /home/sbache/miniconda3/envs/modkit_064

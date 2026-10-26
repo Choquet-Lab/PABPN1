@@ -1,0 +1,270 @@
+__default__:
+    cpus-per-task : 1
+    mem : 2G
+    account : def-kchoquet
+    time: "0-00:20:00"
+
+demux_p2_rep4:
+    cpus-per-task : 1
+    mem : 60G
+    gres : "gpu:h100:1"
+    account : def-kchoquet
+    time: "1-00:00:00"
+    job-name: "demux_p2_rep4"
+
+dorado_minion:
+    cpus-per-task : 3
+    mem : 60G
+    gres : "gpu:h100:1"
+    account : def-kchoquet
+    time: "0-05:00:00"
+    job-name: "dorado_minion"
+
+dorado_p2:
+    cpus-per-task : 4
+    mem : 80G
+    gres : "gpu:h100:1"
+    account : def-kchoquet
+    time: "2-00:00:00"
+    job-name: "dorado_p2"
+
+dorado_p2_rep4:
+    cpus-per-task : 4
+    mem : 80G
+    gres : "gpu:h100:1"
+    account : def-kchoquet
+    time: "1-00:00:00"
+    job-name: "dorado_p2_rep4"
+
+dorado_p2_myoblasts:
+    cpus-per-task : 4
+    mem : 80G
+    gres : "gpu:h100:1"
+    account : def-kchoquet
+    time: "0-10:00:00"
+    job-name: "dorado_p2_myoblasts"
+
+nanoplot:
+    cpus-per-task : 4
+    mem : 20G
+    account : def-kchoquet
+    time: "0-01:00:00"
+    job-name: "nanoplot"
+
+dorado_polya_extract:
+    cpus-per-task : 2
+    mem : 100G
+    account : def-kchoquet
+    time: "0-03:00:00"
+    job-name: "dorado_polya_extract"
+
+convert_to_fastq:
+    cpus-per-task : 2
+    mem : 60G
+    account : def-kchoquet
+    time: "0-02:00:00"
+    job-name: "convert_to_fastq"
+
+minimap2:
+    cpus-per-task : 4
+    mem : 200G
+    account : def-kchoquet
+    time: "0-10:00:00"
+    job-name: "minimap2"
+
+samtools_sort_index:
+    cpus-per-task : 1
+    mem : 20G
+    account : def-kchoquet
+    time: "0-01:00:00"
+    job-name: "samtools_sort_index"
+
+extract_unique_reads:
+    cpus-per-task : 4
+    mem : 300G
+    account : def-kchoquet
+    time: "0-04:00:00"
+    job-name: "extract_unique_reads"
+
+bed_from_bam:
+    cpus-per-task : 1
+    mem : 100G
+    account : def-kchoquet
+    time: "0-01:00:00"
+    job-name: "bed_from_bam"
+
+bed_intersect_genes:
+    cpus-per-task : 1
+    mem : 5G
+    account : def-kchoquet
+    time: "0-00:20:00"
+    job-name: "bed_intersect_genes"
+
+bed_from_bam_rep4:
+    cpus-per-task : 1
+    mem : 100G
+    account : def-kchoquet
+    time: "0-01:00:00"
+    job-name: "bed_from_bam_rep4"
+
+bed_intersect_genes_rep4:
+    cpus-per-task : 1
+    mem : 5G
+    account : def-kchoquet
+    time: "0-00:20:00"
+    job-name: "bed_intersect_genes_rep4"
+
+bed_intersect_introns:
+    cpus-per-task : 1
+    mem : 100G
+    account : def-kchoquet
+    time: "0-00:20:00"
+    job-name: "bed_intersect_introns"
+
+splicing_info:
+    cpus-per-task : 2
+    mem : 300G
+    account : def-kchoquet
+    time: "0-06:00:00"
+    job-name: "splicing_info"
+
+splicing_fractions:
+    cpus-per-task : 1
+    mem : 60G
+    account : def-kchoquet
+    time: "0-01:00:00"
+    job-name: "splicing_fractions"
+
+IR_analysis:
+    cpus-per-task : 1
+    mem : 100G
+    account : def-kchoquet
+    time: "0-02:00:00"
+    job-name: "IR_analysis"
+
+get_read_ends:
+    cpus-per-task : 2
+    mem : 40G
+    account : def-kchoquet
+    time: "0-02:00:00"
+    job-name: "get_read_ends"
+
+isoquant:
+    cpus-per-task : 4
+    mem : 80G
+    account : def-kchoquet
+    time: "2-00:00:00"
+    job-name: "isoquant"
+
+split_multiplexed_bam:
+    cpus-per-task : 1
+    mem : 40G
+    account : def-kchoquet
+    gres : "gpu:h100:1"
+    time: "0-05:00:00"
+    job-name: "split_multiplexed_bam"
+
+rename_bam_from_multiplex:
+    cpus-per-task : 1
+    mem : 10G
+    account : def-kchoquet
+    time: "0-00:30:00"
+    job-name: "rename_bam_from_multiplex"
+
+count_reads_genes:
+    cpus-per-task : 1
+    mem : 20G
+    account : def-kchoquet
+    time: "0-00:30:00"
+    job-name: "count_reads_genes"
+
+modkit:
+    cpus-per-task : 4
+    mem : 50G
+    account : def-kchoquet
+    time: "0-07:00:00"
+    job-name: "modkit"
+
+modkit_summary:
+    cpus-per-task : 4
+    mem : 50G
+    account : def-kchoquet
+    time: "0-02:00:00"
+    job-name: "modkit_summary"
+
+modkit_diff_rep3:
+    cpus-per-task : 4
+    mem : 50G
+    account : def-kchoquet
+    time: "0-06:00:00"
+    job-name: "modkit_diff_rep3"
+
+modkit_diff_rep4:
+    cpus-per-task : 4
+    mem : 50G
+    account : def-kchoquet
+    time: "0-06:00:00"
+    job-name: "modkit_diff_rep4"
+
+modkit_diff_all_reps:
+    cpus-per-task : 4
+    mem : 50G
+    account : def-kchoquet
+    time: "0-06:00:00"
+    job-name: "modkit_diff_all_reps"
+
+bed_intersect_m6A:
+    cpus-per-task : 1
+    mem : 5G
+    account : def-kchoquet
+    time: "0-00:20:00"
+    job-name: "bed_intersect_m6A"
+
+modkit_extract_calls:
+    cpus-per-task : 6
+    mem : 200G
+    account : def-kchoquet
+    time: "0-10:00:00"
+    job-name: "modkit_extract_calls"
+
+modkit_extract_read_stats:
+    cpus-per-task : 4
+    mem : 200G
+    account : def-kchoquet
+    time: "0-10:00:00"
+    job-name: "modkit_extract_read_stats"
+
+bed_from_bam_rep4:
+    cpus-per-task : 1
+    mem : 100G
+    account : def-kchoquet
+    time: "0-01:00:00"
+    job-name: "bed_from_bam_rep4"
+
+modkit_064:
+    cpus-per-task : 4
+    mem : 50G
+    account : def-kchoquet
+    time: "0-07:00:00"
+    job-name: "modkit_064"
+
+modkit_064_diff_rep3:
+    cpus-per-task : 4
+    mem : 50G
+    account : def-kchoquet
+    time: "0-06:00:00"
+    job-name: "modkit_064_diff_rep3"
+
+modkit_064_diff_rep4:
+    cpus-per-task : 4
+    mem : 50G
+    account : def-kchoquet
+    time: "0-06:00:00"
+    job-name: "modkit_064_diff_rep4"
+
+modkit_064_diff_all_reps:
+    cpus-per-task : 4
+    mem : 50G
+    account : def-kchoquet
+    time: "0-06:00:00"
+    job-name: "modkit_064_diff_all_reps"
